@@ -70,8 +70,9 @@ public class GroupCipher {
                                                                  ciphertext,
                                                                  senderKeyState.getSigningKeyPrivate());
 
-        senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
+//         senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
 
+        Log.d("Skippingxxx", "asdf");
         senderKeyStore.storeSenderKey(senderKeyId, record);
 
         return senderKeyMessage.serialize();
