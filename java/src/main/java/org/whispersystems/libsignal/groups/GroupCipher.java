@@ -74,12 +74,10 @@ public class GroupCipher {
                                                                  senderKeyState.getSigningKeyPrivate());
 
 //         senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
-
-        Log.w("Skippingxxx", "asdf");
         
         senderKeyStore.storeSenderKey(senderKeyId, record);
-        return null;
-//          return senderKeyMessage.serialize();
+//         return null;
+         return senderKeyMessage.serialize();
       } catch (InvalidKeyIdException e) {
         throw new NoSessionException(e);
       }
