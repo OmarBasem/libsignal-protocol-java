@@ -164,14 +164,14 @@ public class GroupCipher {
 //       }
 //     }
 
-    if (iteration - senderChainKey.getIteration() > 2000) {
-      throw new InvalidMessageException("Over 2000 messages into the future!");
-    }
+//     if (iteration - senderChainKey.getIteration() > 2000) {
+//       throw new InvalidMessageException("Over 2000 messages into the future!");
+//     }
 
-    while (senderChainKey.getIteration() < iteration) {
-      senderKeyState.addSenderMessageKey(senderChainKey.getSenderMessageKey());
-      senderChainKey = senderChainKey.getNext();
-    }
+//     while (senderChainKey.getIteration() < iteration) {
+//       senderKeyState.addSenderMessageKey(senderChainKey.getSenderMessageKey());
+//       senderChainKey = senderChainKey.getNext();
+//     }
 
 //     senderKeyState.setSenderChainKey(senderChainKey.getNext());
     return senderChainKey.getSenderMessageKey();
