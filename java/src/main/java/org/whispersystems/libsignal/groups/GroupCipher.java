@@ -79,7 +79,7 @@ public class GroupCipher {
 
 //         senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
         
-        senderKeyStore.storeSenderKey(senderKeyId, record);
+//         senderKeyStore.storeSenderKey(senderKeyId, record);
 //         return null;
          return senderKeyMessage.serialize();
       } catch (InvalidKeyIdException e) {
@@ -141,7 +141,7 @@ public class GroupCipher {
 
         callback.handlePlaintext(plaintext);
 
-        senderKeyStore.storeSenderKey(senderKeyId, record);
+//         senderKeyStore.storeSenderKey(senderKeyId, record);
 
         return plaintext;
       } catch (org.whispersystems.libsignal.InvalidKeyException | InvalidKeyIdException e) {
