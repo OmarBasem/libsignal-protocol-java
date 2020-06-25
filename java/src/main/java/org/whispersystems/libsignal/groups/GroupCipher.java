@@ -155,14 +155,14 @@ public class GroupCipher {
   {
     SenderChainKey senderChainKey = senderKeyState.getSenderChainKey();
 
-    if (senderChainKey.getIteration() > iteration) {
-      if (senderKeyState.hasSenderMessageKey(iteration)) {
-        return senderKeyState.removeSenderMessageKey(iteration);
-      } else {
-        throw new DuplicateMessageException("Received message with old counter: " +
-                                            senderChainKey.getIteration() + " , " + iteration);
-      }
-    }
+//     if (senderChainKey.getIteration() > iteration) {
+//       if (senderKeyState.hasSenderMessageKey(iteration)) {
+//         return senderKeyState.removeSenderMessageKey(iteration);
+//       } else {
+//         throw new DuplicateMessageException("Received message with old counter: " +
+//                                             senderChainKey.getIteration() + " , " + iteration);
+//       }
+//     }
 
     if (iteration - senderChainKey.getIteration() > 2000) {
       throw new InvalidMessageException("Over 2000 messages into the future!");
