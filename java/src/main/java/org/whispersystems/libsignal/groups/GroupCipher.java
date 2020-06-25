@@ -28,7 +28,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import android.util.Log;
+import org.whispersystems.libsignal.logging.Log;
 
 
 /**
@@ -75,9 +75,8 @@ public class GroupCipher {
 
 //         senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
 
-        Log.d("Skippingxxx", "asdf");
+        Log.w("Skippingxxx", "asdf");
         
-        Log.wtf("wtfxxx", "ddd");
         senderKeyStore.storeSenderKey(senderKeyId, record);
         return null;
 //          return senderKeyMessage.serialize();
