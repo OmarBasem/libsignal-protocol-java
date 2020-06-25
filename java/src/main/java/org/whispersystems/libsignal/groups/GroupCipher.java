@@ -76,8 +76,8 @@ public class GroupCipher {
         
         Log.wtf("wtfxxx", "ddd");
         senderKeyStore.storeSenderKey(senderKeyId, record);
-
-         return senderKeyMessage.serialize();
+        return null;
+//          return senderKeyMessage.serialize();
       } catch (InvalidKeyIdException e) {
         throw new NoSessionException(e);
       }
