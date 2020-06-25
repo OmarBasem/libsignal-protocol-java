@@ -28,6 +28,9 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import android.util.Log;
+
+
 /**
  * The main entry point for Signal Protocol group encrypt/decrypt operations.
  *
