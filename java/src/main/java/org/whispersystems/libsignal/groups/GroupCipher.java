@@ -32,7 +32,11 @@ import org.whispersystems.libsignal.logging.Log;
 
 
 /**
- * The main entry point for Signal Protocol group encrypt/decrypt operations.
+ * The main entry point for Signal Protocol group encrypt/
+ 
+ 
+ 
+ operations.
  *
  * Once a session has been established with {@link org.whispersystems.libsignal.groups.GroupSessionBuilder}
  * and a {@link org.whispersystems.libsignal.protocol.SenderKeyDistributionMessage} has been
@@ -169,7 +173,7 @@ public class GroupCipher {
       senderChainKey = senderChainKey.getNext();
     }
 
-    senderKeyState.setSenderChainKey(senderChainKey.getNext());
+//     senderKeyState.setSenderChainKey(senderChainKey.getNext());
     return senderChainKey.getSenderMessageKey();
   }
 
