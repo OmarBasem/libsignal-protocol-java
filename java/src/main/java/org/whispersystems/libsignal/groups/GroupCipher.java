@@ -81,6 +81,7 @@ public class GroupCipher {
         
 //         senderKeyStore.storeSenderKey(senderKeyId, record);
 //         return null;
+       System.out.println("XXXYYY");
          return senderKeyMessage.serialize();
       } catch (InvalidKeyIdException e) {
         throw new NoSessionException(e);
