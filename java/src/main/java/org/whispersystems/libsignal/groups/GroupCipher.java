@@ -71,6 +71,7 @@ public class GroupCipher {
   public byte[] encrypt(byte[] paddedPlaintext) throws NoSessionException {
     synchronized (LOCK) {
       try {
+       System.out.println("xxxyyyplain: " + Arrays.toString(paddedPlaintext));
         SenderKeyRecord  record         = senderKeyStore.loadSenderKey(senderKeyId);
         SenderKeyState   senderKeyState = record.getSenderKeyState();
         SenderMessageKey senderKey      = senderKeyState.getSenderChainKey().getSenderMessageKey();
@@ -154,6 +155,7 @@ public class GroupCipher {
 
 //         senderKeyStore.storeSenderKey(senderKeyId, record);
  System.out.println("XXXYYY10");
+        System.out.println("xxxyyyplain2: " + Arrays.toString(plaintext));
         return plaintext;
       } catch (org.whispersystems.libsignal.InvalidKeyException | InvalidKeyIdException e) {
         throw new InvalidMessageException(e);
