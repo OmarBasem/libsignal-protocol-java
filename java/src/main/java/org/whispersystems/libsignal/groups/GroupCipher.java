@@ -30,6 +30,8 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import java.util.Arrays;
+
 import org.whispersystems.libsignal.logging.Log;
 
 
