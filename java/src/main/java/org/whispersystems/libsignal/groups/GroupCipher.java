@@ -70,6 +70,7 @@ public class GroupCipher {
         SenderKeyRecord  record         = senderKeyStore.loadSenderKey(senderKeyId);
         SenderKeyState   senderKeyState = record.getSenderKeyState();
         SenderMessageKey senderKey      = senderKeyState.getSenderChainKey().getSenderMessageKey();
+       System.out.println("XXXYYYIV: " + Base64.encode(senderKey.getIv()));
         byte[]           ciphertext     = getCipherText(senderKey.getIv(), senderKey.getCipherKey(), paddedPlaintext);
 
         SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyState.getKeyId(),
@@ -188,6 +189,7 @@ public class GroupCipher {
       throws InvalidMessageException
   {
     try {
+     System.out.println("XXXYYYIV2: " + Base64.encode(iv));
       System.out.println("XXXYYY8-1");
       IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
       System.out.println("XXXYYY8-2");
