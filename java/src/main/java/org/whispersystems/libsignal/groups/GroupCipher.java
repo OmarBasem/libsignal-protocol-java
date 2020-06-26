@@ -5,7 +5,7 @@
  */
 package org.whispersystems.libsignal.groups;
 
-import com.sun.org.apache.xml.internal.security.utils.Base64;
+
 
 import org.whispersystems.libsignal.DecryptionCallback;
 import org.whispersystems.libsignal.DuplicateMessageException;
@@ -72,7 +72,8 @@ public class GroupCipher {
         SenderKeyRecord  record         = senderKeyStore.loadSenderKey(senderKeyId);
         SenderKeyState   senderKeyState = record.getSenderKeyState();
         SenderMessageKey senderKey      = senderKeyState.getSenderChainKey().getSenderMessageKey();
-       System.out.println("XXXYYYIV: " + Base64.encode(senderKey.getIv()));
+       System.out.println("XXXYYYIV: " + senderKey.getIv());
+        System.out.println("XXXYYYIVString: " + Arrays.toString(senderKey.getIv()));
         byte[]           ciphertext     = getCipherText(senderKey.getIv(), senderKey.getCipherKey(), paddedPlaintext);
 
         SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyState.getKeyId(),
@@ -191,7 +192,8 @@ public class GroupCipher {
       throws InvalidMessageException
   {
     try {
-     System.out.println("XXXYYYIV2: " + Base64.encode(iv));
+     System.out.println("XXXYYYIV2: " + iv);
+      System.out.println("XXXYYYIV2String: " + Arrays.toString(iv));
       System.out.println("XXXYYY8-1");
       IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
       System.out.println("XXXYYY8-2");
