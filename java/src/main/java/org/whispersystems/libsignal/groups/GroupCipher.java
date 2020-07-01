@@ -75,8 +75,8 @@ public class GroupCipher {
         SenderKeyRecord  record         = senderKeyStore.loadSenderKey(senderKeyId);
         SenderKeyState   senderKeyState = record.getSenderKeyState();
         SenderMessageKey senderKey      = senderKeyState.getSenderChainKey().getSenderMessageKey();
-       System.out.println("XXXYYYIV: " + senderKey.getIv());
-        System.out.println("XXXYYYIVString: " + Arrays.toString(senderKey.getIv()));
+//        System.out.println("XXXYYYIV: " + senderKey.getIv());
+//         System.out.println("XXXYYYIVString: " + Arrays.toString(senderKey.getIv()));
         byte[]           ciphertext     = getCipherText(senderKey.getIv(), senderKey.getCipherKey(), paddedPlaintext);
 
         SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyState.getKeyId(),
@@ -88,7 +88,7 @@ public class GroupCipher {
         
 //         senderKeyStore.storeSenderKey(senderKeyId, record);
 //         return null;
-       System.out.println("XXXYYY");
+//        System.out.println("XXXYYY");
          return senderKeyMessage.serialize();
       } catch (InvalidKeyIdException e) {
         throw new NoSessionException(e);
@@ -133,28 +133,28 @@ public class GroupCipher {
   {
     synchronized (LOCK) {
       try {
-        System.out.println("XXXYYY2");
+//         System.out.println("XXXYYY2");
         SenderKeyRecord record = senderKeyStore.loadSenderKey(senderKeyId);
 
         if (record.isEmpty()) {
-          System.out.println("XXXYYY3");
+//           System.out.println("XXXYYY3");
           throw new NoSessionException("No sender key for: " + senderKeyId);
         }
- System.out.println("XXXYYY4");
+//  System.out.println("XXXYYY4");
         SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyMessageBytes);
-        System.out.println("XXXYYY5");
+//         System.out.println("XXXYYY5");
         SenderKeyState   senderKeyState   = record.getSenderKeyState(senderKeyMessage.getKeyId());
- System.out.println("XXXYYY6");
+//  System.out.println("XXXYYY6");
         senderKeyMessage.verifySignature(senderKeyState.getSigningKeyPublic());
- System.out.println("XXXYYY7");
+//  System.out.println("XXXYYY7");
         SenderMessageKey senderKey = getSenderKey(senderKeyState, senderKeyMessage.getIteration());
- System.out.println("XXXYYY8");
+//  System.out.println("XXXYYY8");
         byte[] plaintext = getPlainText(senderKey.getIv(), senderKey.getCipherKey(), senderKeyMessage.getCipherText());
- System.out.println("XXXYYY9");
+//  System.out.println("XXXYYY9");
         callback.handlePlaintext(plaintext);
 
 //         senderKeyStore.storeSenderKey(senderKeyId, record);
- System.out.println("XXXYYY10");
+//  System.out.println("XXXYYY10");
         System.out.println("xxxyyyplain2: " + Arrays.toString(plaintext));
         return plaintext;
       } catch (org.whispersystems.libsignal.InvalidKeyException | InvalidKeyIdException e) {
@@ -166,7 +166,7 @@ public class GroupCipher {
   private SenderMessageKey getSenderKey(SenderKeyState senderKeyState, int iteration)
       throws DuplicateMessageException, InvalidMessageException
   {
-    System.out.println("XXXYYY7-1");
+//     System.out.println("XXXYYY7-1");
     SenderChainKey senderChainKey = senderKeyState.getSenderChainKey();
 
 //     if (senderChainKey.getIteration() > iteration) {
@@ -188,7 +188,7 @@ public class GroupCipher {
 //     }
 
 //     senderKeyState.setSenderChainKey(senderChainKey.getNext());
-    System.out.println("XXXYYY7-2");
+//     System.out.println("XXXYYY7-2");
     return senderChainKey.getSenderMessageKey();
   }
 
@@ -196,41 +196,41 @@ public class GroupCipher {
       throws InvalidMessageException
   {
     try {
-     System.out.println("XXXYYYIV2: " + iv);
-      System.out.println("XXXYYYIV2String: " + Arrays.toString(iv));
-      System.out.println("XXXYYY8-1");
+//      System.out.println("XXXYYYIV2: " + iv);
+//       System.out.println("XXXYYYIV2String: " + Arrays.toString(iv));
+//       System.out.println("XXXYYY8-1");
       IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-      System.out.println("XXXYYY8-2");
+//       System.out.println("XXXYYY8-2");
       Cipher          cipher          = Cipher.getInstance("AES/CBC/PKCS5Padding");
- System.out.println("XXXYYY8-3");
+//  System.out.println("XXXYYY8-3");
       cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), ivParameterSpec);
- System.out.println("XXXYYY8-4");
+//  System.out.println("XXXYYY8-4");
       return cipher.doFinal(ciphertext);
     } catch (NoSuchAlgorithmException | NoSuchPaddingException | java.security.InvalidKeyException |
              InvalidAlgorithmParameterException e)
     {
-      System.out.println("XXXYYY8-5");
+//       System.out.println("XXXYYY8-5");
       throw new AssertionError(e);
     } catch (IllegalBlockSizeException | BadPaddingException e) {
-      System.out.println("XXXYYY8-6");
+//       System.out.println("XXXYYY8-6");
       throw new InvalidMessageException(e);
     }
   }
 
   private byte[] getCipherText(byte[] iv, byte[] key, byte[] plaintext) {
     try {
-      System.out.println("XXXYYY8-01");
+//       System.out.println("XXXYYY8-01");
       IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-      System.out.println("XXXYYY8-02");
+//       System.out.println("XXXYYY8-02");
       Cipher          cipher          = Cipher.getInstance("AES/CBC/PKCS5Padding");
- System.out.println("XXXYYY8-03");
+//  System.out.println("XXXYYY8-03");
       cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"), ivParameterSpec);
- System.out.println("XXXYYY8-04");
+//  System.out.println("XXXYYY8-04");
       return cipher.doFinal(plaintext);
     } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException |
              IllegalBlockSizeException | BadPaddingException | java.security.InvalidKeyException e)
     {
-      System.out.println("XXXYYY8-05");
+//       System.out.println("XXXYYY8-05");
       throw new AssertionError(e);
     }
   }
