@@ -87,14 +87,13 @@ public class GroupCipher {
 //         senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
         
 //         senderKeyStore.storeSenderKey(senderKeyId, record);
-//         return null;
-//        System.out.println("XXXYYY");
          return senderKeyMessage.serialize();
       } catch (InvalidKeyIdException e) {
         throw new NoSessionException(e);
       }
     }
   }
+
 
   /**
    * Decrypt a SenderKey group message.
@@ -196,41 +195,28 @@ public class GroupCipher {
       throws InvalidMessageException
   {
     try {
-//      System.out.println("XXXYYYIV2: " + iv);
-//       System.out.println("XXXYYYIV2String: " + Arrays.toString(iv));
-//       System.out.println("XXXYYY8-1");
       IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-//       System.out.println("XXXYYY8-2");
       Cipher          cipher          = Cipher.getInstance("AES/CBC/PKCS5Padding");
-//  System.out.println("XXXYYY8-3");
       cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), ivParameterSpec);
-//  System.out.println("XXXYYY8-4");
       return cipher.doFinal(ciphertext);
     } catch (NoSuchAlgorithmException | NoSuchPaddingException | java.security.InvalidKeyException |
              InvalidAlgorithmParameterException e)
     {
-//       System.out.println("XXXYYY8-5");
       throw new AssertionError(e);
     } catch (IllegalBlockSizeException | BadPaddingException e) {
-//       System.out.println("XXXYYY8-6");
       throw new InvalidMessageException(e);
     }
   }
 
   private byte[] getCipherText(byte[] iv, byte[] key, byte[] plaintext) {
     try {
-//       System.out.println("XXXYYY8-01");
       IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-//       System.out.println("XXXYYY8-02");
       Cipher          cipher          = Cipher.getInstance("AES/CBC/PKCS5Padding");
-//  System.out.println("XXXYYY8-03");
       cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"), ivParameterSpec);
-//  System.out.println("XXXYYY8-04");
       return cipher.doFinal(plaintext);
     } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException |
              IllegalBlockSizeException | BadPaddingException | java.security.InvalidKeyException e)
     {
-//       System.out.println("XXXYYY8-05");
       throw new AssertionError(e);
     }
   }
@@ -239,5 +225,96 @@ public class GroupCipher {
     @Override
     public void handlePlaintext(byte[] plaintext) {}
   }
+ 
+ // Chat Messages
+ 
+    public byte[] encryptMessage(byte[] paddedPlaintext) throws NoSessionException {
+    synchronized (LOCK) {
+      try {
+        SenderKeyRecord  record         = senderKeyStore.loadSenderKey(senderKeyId);
+        SenderKeyState   senderKeyState = record.getSenderKeyState();
+        SenderMessageKey senderKey      = senderKeyState.getSenderChainKey().getSenderMessageKey();
+        byte[]           ciphertext     = getCipherText(senderKey.getIv(), senderKey.getCipherKey(), paddedPlaintext);
 
+        SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyState.getKeyId(),
+                                                                 senderKey.getIteration(),
+                                                                 ciphertext,
+                                                                 senderKeyState.getSigningKeyPrivate());
+
+        senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
+
+        senderKeyStore.storeSenderKey(senderKeyId, record);
+
+        return senderKeyMessage.serialize();
+      } catch (InvalidKeyIdException e) {
+        throw new NoSessionException(e);
+      }
+    }
+  }
+ 
+  public byte[] decryptMessage(byte[] senderKeyMessageBytes)
+      throws LegacyMessageException, DuplicateMessageException, InvalidMessageException, NoSessionException
+  {
+    return decryptMessage(senderKeyMessageBytes, new NullDecryptionCallback());
+  }
+
+ 
+  public byte[] decryptMessage(byte[] senderKeyMessageBytes, DecryptionCallback callback)
+      throws LegacyMessageException, InvalidMessageException, DuplicateMessageException,
+             NoSessionException
+  {
+    synchronized (LOCK) {
+      try {
+        SenderKeyRecord record = senderKeyStore.loadSenderKey(senderKeyId);
+
+        if (record.isEmpty()) {
+          throw new NoSessionException("No sender key for: " + senderKeyId);
+        }
+
+        SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyMessageBytes);
+        SenderKeyState   senderKeyState   = record.getSenderKeyState(senderKeyMessage.getKeyId());
+
+        senderKeyMessage.verifySignature(senderKeyState.getSigningKeyPublic());
+
+        SenderMessageKey senderKey = getSenderKeyMessage(senderKeyState, senderKeyMessage.getIteration());
+
+        byte[] plaintext = getPlainText(senderKey.getIv(), senderKey.getCipherKey(), senderKeyMessage.getCipherText());
+
+        callback.handlePlaintext(plaintext);
+
+        senderKeyStore.storeSenderKey(senderKeyId, record);
+
+        return plaintext;
+      } catch (org.whispersystems.libsignal.InvalidKeyException | InvalidKeyIdException e) {
+        throw new InvalidMessageException(e);
+      }
+    }
+  }
+
+  private SenderMessageKey getSenderKeyMessage(SenderKeyState senderKeyState, int iteration)
+      throws DuplicateMessageException, InvalidMessageException
+  {
+    SenderChainKey senderChainKey = senderKeyState.getSenderChainKey();
+
+    if (senderChainKey.getIteration() > iteration) {
+      if (senderKeyState.hasSenderMessageKey(iteration)) {
+        return senderKeyState.removeSenderMessageKey(iteration);
+      } else {
+        throw new DuplicateMessageException("Received message with old counter: " +
+                                            senderChainKey.getIteration() + " , " + iteration);
+      }
+    }
+
+    if (iteration - senderChainKey.getIteration() > 2000) {
+      throw new InvalidMessageException("Over 2000 messages into the future!");
+    }
+
+    while (senderChainKey.getIteration() < iteration) {
+      senderKeyState.addSenderMessageKey(senderChainKey.getSenderMessageKey());
+      senderChainKey = senderChainKey.getNext();
+    }
+
+    senderKeyState.setSenderChainKey(senderChainKey.getNext());
+    return senderChainKey.getSenderMessageKey();
+  }
 }
