@@ -228,7 +228,7 @@ public class GroupCipher {
  
  // Chat Messages
  
-    public byte[] encryptMessage(byte[] paddedPlaintext) throws NoSessionException {
+  public byte[] encryptChat(byte[] paddedPlaintext) throws NoSessionException {
     synchronized (LOCK) {
       try {
         SenderKeyRecord  record         = senderKeyStore.loadSenderKey(senderKeyId);
@@ -237,9 +237,9 @@ public class GroupCipher {
         byte[]           ciphertext     = getCipherText(senderKey.getIv(), senderKey.getCipherKey(), paddedPlaintext);
 
         SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyState.getKeyId(),
-                                                                 senderKey.getIteration(),
-                                                                 ciphertext,
-                                                                 senderKeyState.getSigningKeyPrivate());
+                senderKey.getIteration(),
+                ciphertext,
+                senderKeyState.getSigningKeyPrivate());
 
         senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
 
@@ -251,17 +251,17 @@ public class GroupCipher {
       }
     }
   }
- 
-  public byte[] decryptMessage(byte[] senderKeyMessageBytes)
-      throws LegacyMessageException, DuplicateMessageException, InvalidMessageException, NoSessionException
+
+  public byte[] decryptChat(byte[] senderKeyMessageBytes)
+          throws LegacyMessageException, DuplicateMessageException, InvalidMessageException, NoSessionException
   {
     return decryptMessage(senderKeyMessageBytes, new NullDecryptionCallback());
   }
 
- 
-  public byte[] decryptMessage(byte[] senderKeyMessageBytes, DecryptionCallback callback)
-      throws LegacyMessageException, InvalidMessageException, DuplicateMessageException,
-             NoSessionException
+
+  public byte[] decryptChat(byte[] senderKeyMessageBytes, DecryptionCallback callback)
+          throws LegacyMessageException, InvalidMessageException, DuplicateMessageException,
+          NoSessionException
   {
     synchronized (LOCK) {
       try {
@@ -291,8 +291,8 @@ public class GroupCipher {
     }
   }
 
-  private SenderMessageKey getSenderKeyMessage(SenderKeyState senderKeyState, int iteration)
-      throws DuplicateMessageException, InvalidMessageException
+  private SenderMessageKey getSenderKeyChat(SenderKeyState senderKeyState, int iteration)
+          throws DuplicateMessageException, InvalidMessageException
   {
     SenderChainKey senderChainKey = senderKeyState.getSenderChainKey();
 
@@ -301,7 +301,7 @@ public class GroupCipher {
         return senderKeyState.removeSenderMessageKey(iteration);
       } else {
         throw new DuplicateMessageException("Received message with old counter: " +
-                                            senderChainKey.getIteration() + " , " + iteration);
+                senderChainKey.getIteration() + " , " + iteration);
       }
     }
 
