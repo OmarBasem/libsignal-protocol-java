@@ -228,7 +228,7 @@ public class GroupCipher {
  
  // Chat Messages
  
-  public byte[] encryptChat(byte[] paddedPlaintext) throws NoSessionException {
+ public byte[] encryptChat(byte[] paddedPlaintext) throws NoSessionException {
     synchronized (LOCK) {
       try {
         SenderKeyRecord  record         = senderKeyStore.loadSenderKey(senderKeyId);
@@ -255,7 +255,7 @@ public class GroupCipher {
   public byte[] decryptChat(byte[] senderKeyMessageBytes)
           throws LegacyMessageException, DuplicateMessageException, InvalidMessageException, NoSessionException
   {
-    return decryptMessage(senderKeyMessageBytes, new NullDecryptionCallback());
+    return decryptChat(senderKeyMessageBytes, new NullDecryptionCallback());
   }
 
 
@@ -276,7 +276,7 @@ public class GroupCipher {
 
         senderKeyMessage.verifySignature(senderKeyState.getSigningKeyPublic());
 
-        SenderMessageKey senderKey = getSenderKeyMessage(senderKeyState, senderKeyMessage.getIteration());
+        SenderMessageKey senderKey = getSenderKeyChat(senderKeyState, senderKeyMessage.getIteration());
 
         byte[] plaintext = getPlainText(senderKey.getIv(), senderKey.getCipherKey(), senderKeyMessage.getCipherText());
 
