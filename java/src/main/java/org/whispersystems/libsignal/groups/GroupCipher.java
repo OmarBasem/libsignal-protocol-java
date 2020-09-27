@@ -7,6 +7,7 @@ package org.whispersystems.libsignal.groups;
 
 
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.whispersystems.libsignal.DecryptionCallback;
 import org.whispersystems.libsignal.DuplicateMessageException;
 import org.whispersystems.libsignal.InvalidKeyIdException;
@@ -68,31 +69,6 @@ public class GroupCipher {
    * @return Ciphertext.
    * @throws NoSessionException
    */
-  public byte[] encrypt(byte[] paddedPlaintext) throws NoSessionException {
-    synchronized (LOCK) {
-      try {
-        System.out.println("xxxyyyplain: " + Arrays.toString(paddedPlaintext));
-        SenderKeyRecord  record         = senderKeyStore.loadSenderKey(senderKeyId);
-        SenderKeyState   senderKeyState = record.getSenderKeyState();
-        SenderMessageKey senderKey      = senderKeyState.getSenderChainKey().getSenderMessageKey();
-//        System.out.println("XXXYYYIV: " + senderKey.getIv());
-//         System.out.println("XXXYYYIVString: " + Arrays.toString(senderKey.getIv()));
-        byte[]           ciphertext     = getCipherText(senderKey.getIv(), senderKey.getCipherKey(), paddedPlaintext);
-
-        SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyState.getKeyId(),
-                senderKey.getIteration(),
-                ciphertext,
-                senderKeyState.getSigningKeyPrivate());
-
-//         senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
-
-//         senderKeyStore.storeSenderKey(senderKeyId, record);
-        return senderKeyMessage.serialize();
-      } catch (InvalidKeyIdException e) {
-        throw new NoSessionException(e);
-      }
-    }
-  }
 
 
   /**
@@ -104,82 +80,8 @@ public class GroupCipher {
    * @throws InvalidMessageException
    * @throws DuplicateMessageException
    */
-  public byte[] decrypt(byte[] senderKeyMessageBytes)
-          throws LegacyMessageException, DuplicateMessageException, InvalidMessageException, NoSessionException
-  {
-    System.out.println("XXXYYY1");
-    return decrypt(senderKeyMessageBytes, new NullDecryptionCallback());
-  }
 
-  /**
-   * Decrypt a SenderKey group message.
-   *
-   * @param senderKeyMessageBytes The received ciphertext.
-   * @param callback   A callback that is triggered after decryption is complete,
-   *                    but before the updated session state has been committed to the session
-   *                    DB.  This allows some implementations to store the committed plaintext
-   *                    to a DB first, in case they are concerned with a crash happening between
-   *                    the time the session state is updated but before they're able to store
-   *                    the plaintext to disk.
-   * @return Plaintext
-   * @throws LegacyMessageException
-   * @throws InvalidMessageException
-   * @throws DuplicateMessageException
-   */
-  public byte[] decrypt(byte[] senderKeyMessageBytes, DecryptionCallback callback)
-          throws LegacyMessageException, InvalidMessageException, DuplicateMessageException,
-          NoSessionException
-  {
-    synchronized (LOCK) {
-      try {
-        SenderKeyRecord record = senderKeyStore.loadSenderKey(senderKeyId);
 
-        if (record.isEmpty()) {
-          throw new NoSessionException("No sender key for: " + senderKeyId);
-        }
-        SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyMessageBytes);
-        SenderKeyState   senderKeyState   = record.getSenderKeyState(senderKeyMessage.getKeyId());
-        senderKeyMessage.verifySignature(senderKeyState.getSigningKeyPublic());
-        SenderMessageKey senderKey = getSenderKey(senderKeyState, senderKeyMessage.getIteration());
-        byte[] plaintext = getPlainText(senderKey.getIv(), senderKey.getCipherKey(), senderKeyMessage.getCipherText());
-        callback.handlePlaintext(plaintext);
-
-//         senderKeyStore.storeSenderKey(senderKeyId, record);
-        return plaintext;
-      } catch (org.whispersystems.libsignal.InvalidKeyException | InvalidKeyIdException e) {
-        throw new InvalidMessageException(e);
-      }
-    }
-  }
-
-  private SenderMessageKey getSenderKey(SenderKeyState senderKeyState, int iteration)
-          throws DuplicateMessageException, InvalidMessageException
-  {
-//     System.out.println("XXXYYY7-1");
-    SenderChainKey senderChainKey = senderKeyState.getSenderChainKey();
-
-//     if (senderChainKey.getIteration() > iteration) {
-//       if (senderKeyState.hasSenderMessageKey(iteration)) {
-//         return senderKeyState.removeSenderMessageKey(iteration);
-//       } else {
-//         throw new DuplicateMessageException("Received message with old counter: " +
-//                                             senderChainKey.getIteration() + " , " + iteration);
-//       }
-//     }
-
-//     if (iteration - senderChainKey.getIteration() > 2000) {
-//       throw new InvalidMessageException("Over 2000 messages into the future!");
-//     }
-
-//     while (senderChainKey.getIteration() < iteration) {
-//       senderKeyState.addSenderMessageKey(senderChainKey.getSenderMessageKey());
-//       senderChainKey = senderChainKey.getNext();
-//     }
-
-//     senderKeyState.setSenderChainKey(senderChainKey.getNext());
-//     System.out.println("XXXYYY7-2");
-    return senderChainKey.getSenderMessageKey();
-  }
 
   private byte[] getPlainText(byte[] iv, byte[] key, byte[] ciphertext)
           throws InvalidMessageException
@@ -216,9 +118,8 @@ public class GroupCipher {
     public void handlePlaintext(byte[] plaintext) {}
   }
 
-  // Chat Messages
 
-  public byte[] encryptChat(byte[] paddedPlaintext) throws NoSessionException {
+  public byte[] encrypt(byte[] paddedPlaintext) throws NoSessionException {
     synchronized (LOCK) {
       try {
         SenderKeyRecord  record         = senderKeyStore.loadSenderKey(senderKeyId);
@@ -242,14 +143,14 @@ public class GroupCipher {
     }
   }
 
-  public byte[] decryptChat(byte[] senderKeyMessageBytes)
+  public byte[] decrypt(byte[] senderKeyMessageBytes, Boolean isChat)
           throws LegacyMessageException, DuplicateMessageException, InvalidMessageException, NoSessionException
   {
-    return decryptChat(senderKeyMessageBytes, new NullDecryptionCallback());
+    return decrypt(senderKeyMessageBytes, new NullDecryptionCallback(), isChat);
   }
 
 
-  public byte[] decryptChat(byte[] senderKeyMessageBytes, DecryptionCallback callback)
+  public byte[] decrypt(byte[] senderKeyMessageBytes, DecryptionCallback callback, Boolean isChat)
           throws LegacyMessageException, InvalidMessageException, DuplicateMessageException,
           NoSessionException
   {
@@ -266,7 +167,7 @@ public class GroupCipher {
 
         senderKeyMessage.verifySignature(senderKeyState.getSigningKeyPublic());
 
-        SenderMessageKey senderKey = getSenderKeyChat(senderKeyState, senderKeyMessage.getIteration());
+        SenderMessageKey senderKey = getSenderKey(senderKeyState, senderKeyMessage.getIteration(), isChat);
 
         byte[] plaintext = getPlainText(senderKey.getIv(), senderKey.getCipherKey(), senderKeyMessage.getCipherText());
 
@@ -281,14 +182,14 @@ public class GroupCipher {
     }
   }
 
-  private SenderMessageKey getSenderKeyChat(SenderKeyState senderKeyState, int iteration)
+  private SenderMessageKey getSenderKey(SenderKeyState senderKeyState, int iteration, Boolean isChat)
           throws DuplicateMessageException, InvalidMessageException
   {
     SenderChainKey senderChainKey = senderKeyState.getSenderChainKey();
 
     if (senderChainKey.getIteration() > iteration) {
       if (senderKeyState.hasSenderMessageKey(iteration)) {
-        return senderKeyState.removeSenderMessageKey(iteration);
+        return senderKeyState.removeSenderMessageKey(iteration, isChat);
       } else {
         throw new DuplicateMessageException("Received message with old counter: " +
                 senderChainKey.getIteration() + " , " + iteration);
