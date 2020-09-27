@@ -144,10 +144,10 @@ public class SenderKeyState {
       }
     }
 
-    this.senderKeyStateStructure = this.senderKeyStateStructure.toBuilder()
-                                                               .clearSenderMessageKeys()
-                                                               .addAllSenderMessageKeys(keys)
-                                                               .build();
+//    this.senderKeyStateStructure = this.senderKeyStateStructure.toBuilder()
+//                                                               .clearSenderMessageKeys()
+//                                                               .addAllSenderMessageKeys(keys)
+//                                                               .build();
 
     if (result != null) {
       return new SenderMessageKey(result.getIteration(), result.getSeed().toByteArray());
