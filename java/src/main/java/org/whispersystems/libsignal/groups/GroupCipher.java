@@ -37,9 +37,15 @@ import org.whispersystems.libsignal.logging.Log;
 
 /**
  * The main entry point for Signal Protocol group encrypt/
+<<<<<<< HEAD
 
 
 
+=======
+ 
+ 
+ 
+>>>>>>> 5d01513565bc035e3e0dbb8b76b82c84dbea2bdb
  operations.
  *
  * Once a session has been established with {@link org.whispersystems.libsignal.groups.GroupSessionBuilder}
@@ -71,7 +77,11 @@ public class GroupCipher {
   public byte[] encrypt(byte[] paddedPlaintext) throws NoSessionException {
     synchronized (LOCK) {
       try {
+<<<<<<< HEAD
         System.out.println("xxxyyyplain: " + Arrays.toString(paddedPlaintext));
+=======
+       System.out.println("xxxyyyplain: " + Arrays.toString(paddedPlaintext));
+>>>>>>> 5d01513565bc035e3e0dbb8b76b82c84dbea2bdb
         SenderKeyRecord  record         = senderKeyStore.loadSenderKey(senderKeyId);
         SenderKeyState   senderKeyState = record.getSenderKeyState();
         SenderMessageKey senderKey      = senderKeyState.getSenderChainKey().getSenderMessageKey();
@@ -85,9 +95,15 @@ public class GroupCipher {
                 senderKeyState.getSigningKeyPrivate());
 
 //         senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
+<<<<<<< HEAD
 
 //         senderKeyStore.storeSenderKey(senderKeyId, record);
         return senderKeyMessage.serialize();
+=======
+        
+//         senderKeyStore.storeSenderKey(senderKeyId, record);
+         return senderKeyMessage.serialize();
+>>>>>>> 5d01513565bc035e3e0dbb8b76b82c84dbea2bdb
       } catch (InvalidKeyIdException e) {
         throw new NoSessionException(e);
       }
@@ -132,19 +148,41 @@ public class GroupCipher {
   {
     synchronized (LOCK) {
       try {
+//         System.out.println("XXXYYY2");
         SenderKeyRecord record = senderKeyStore.loadSenderKey(senderKeyId);
 
         if (record.isEmpty()) {
+//           System.out.println("XXXYYY3");
           throw new NoSessionException("No sender key for: " + senderKeyId);
         }
+<<<<<<< HEAD
+=======
+//  System.out.println("XXXYYY4");
+>>>>>>> 5d01513565bc035e3e0dbb8b76b82c84dbea2bdb
         SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyMessageBytes);
+//         System.out.println("XXXYYY5");
         SenderKeyState   senderKeyState   = record.getSenderKeyState(senderKeyMessage.getKeyId());
+<<<<<<< HEAD
         senderKeyMessage.verifySignature(senderKeyState.getSigningKeyPublic());
         SenderMessageKey senderKey = getSenderKey(senderKeyState, senderKeyMessage.getIteration());
         byte[] plaintext = getPlainText(senderKey.getIv(), senderKey.getCipherKey(), senderKeyMessage.getCipherText());
         callback.handlePlaintext(plaintext);
 
 //         senderKeyStore.storeSenderKey(senderKeyId, record);
+=======
+//  System.out.println("XXXYYY6");
+        senderKeyMessage.verifySignature(senderKeyState.getSigningKeyPublic());
+//  System.out.println("XXXYYY7");
+        SenderMessageKey senderKey = getSenderKey(senderKeyState, senderKeyMessage.getIteration());
+//  System.out.println("XXXYYY8");
+        byte[] plaintext = getPlainText(senderKey.getIv(), senderKey.getCipherKey(), senderKeyMessage.getCipherText());
+//  System.out.println("XXXYYY9");
+        callback.handlePlaintext(plaintext);
+
+//         senderKeyStore.storeSenderKey(senderKeyId, record);
+//  System.out.println("XXXYYY10");
+        System.out.println("xxxyyyplain2: " + Arrays.toString(plaintext));
+>>>>>>> 5d01513565bc035e3e0dbb8b76b82c84dbea2bdb
         return plaintext;
       } catch (org.whispersystems.libsignal.InvalidKeyException | InvalidKeyIdException e) {
         throw new InvalidMessageException(e);
@@ -215,7 +253,53 @@ public class GroupCipher {
     @Override
     public void handlePlaintext(byte[] plaintext) {}
   }
+ 
+ // Chat Messages
+ 
+ public byte[] encryptChat(byte[] paddedPlaintext) throws NoSessionException {
+    synchronized (LOCK) {
+      try {
+        SenderKeyRecord  record         = senderKeyStore.loadSenderKey(senderKeyId);
+        SenderKeyState   senderKeyState = record.getSenderKeyState();
+        SenderMessageKey senderKey      = senderKeyState.getSenderChainKey().getSenderMessageKey();
+        byte[]           ciphertext     = getCipherText(senderKey.getIv(), senderKey.getCipherKey(), paddedPlaintext);
 
+        SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyState.getKeyId(),
+                senderKey.getIteration(),
+                ciphertext,
+                senderKeyState.getSigningKeyPrivate());
+
+        senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
+
+        senderKeyStore.storeSenderKey(senderKeyId, record);
+
+        return senderKeyMessage.serialize();
+      } catch (InvalidKeyIdException e) {
+        throw new NoSessionException(e);
+      }
+    }
+  }
+
+  public byte[] decryptChat(byte[] senderKeyMessageBytes)
+          throws LegacyMessageException, DuplicateMessageException, InvalidMessageException, NoSessionException
+  {
+    return decryptChat(senderKeyMessageBytes, new NullDecryptionCallback());
+  }
+
+
+  public byte[] decryptChat(byte[] senderKeyMessageBytes, DecryptionCallback callback)
+          throws LegacyMessageException, InvalidMessageException, DuplicateMessageException,
+          NoSessionException
+  {
+    synchronized (LOCK) {
+      try {
+        SenderKeyRecord record = senderKeyStore.loadSenderKey(senderKeyId);
+
+        if (record.isEmpty()) {
+          throw new NoSessionException("No sender key for: " + senderKeyId);
+        }
+
+<<<<<<< HEAD
   // Chat Messages
 
   public byte[] encryptChat(byte[] paddedPlaintext) throws NoSessionException {
@@ -261,6 +345,8 @@ public class GroupCipher {
           throw new NoSessionException("No sender key for: " + senderKeyId);
         }
 
+=======
+>>>>>>> 5d01513565bc035e3e0dbb8b76b82c84dbea2bdb
         SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyMessageBytes);
         SenderKeyState   senderKeyState   = record.getSenderKeyState(senderKeyMessage.getKeyId());
 
