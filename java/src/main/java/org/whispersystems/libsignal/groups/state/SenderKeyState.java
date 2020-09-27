@@ -139,7 +139,7 @@ public class SenderKeyState {
 
       if (senderMessageKey.getIteration() == iteration) {
         result = senderMessageKey;
-        iterator.remove();
+//        iterator.remove();
         break;
       }
     }
