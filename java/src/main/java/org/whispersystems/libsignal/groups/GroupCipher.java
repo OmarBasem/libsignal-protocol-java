@@ -124,7 +124,8 @@ public class GroupCipher {
       try {
         SenderKeyRecord  record         = senderKeyStore.loadSenderKey(senderKeyId);
         SenderKeyState   senderKeyState = record.getSenderKeyState();
-        SenderMessageKey senderKey      = senderKeyState.getSenderChainKey().getSenderMessageKey();
+//        SenderMessageKey senderKey      = senderKeyState.getSenderChainKey().getSenderMessageKey();
+        SenderMessageKey senderKey      = senderKeyState.getSenderChainKey().getNext();
         byte[]           ciphertext     = getCipherText(senderKey.getIv(), senderKey.getCipherKey(), paddedPlaintext);
 
         SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyState.getKeyId(),
@@ -132,7 +133,7 @@ public class GroupCipher {
                 ciphertext,
                 senderKeyState.getSigningKeyPrivate());
 
-        senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
+//        senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
 //        senderKeyState.addSenderMessageKey(senderKeyState.getSenderChainKey().getNext().getSenderMessageKey());
 
         senderKeyStore.storeSenderKey(senderKeyId, record);
