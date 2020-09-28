@@ -206,6 +206,7 @@ public class GroupCipher {
     System.out.println("MESSAGE ITERATION GREATER THAN HEAD " + senderKeyState.getStructure().getSenderMessageKeysCount());
     System.out.println("SENDER CHAIN KEY ITERATION COUNT " + senderChainKey.getIteration());
     System.out.println("message iteration " + iteration);
+    System.out.println("Sender message iteration " + senderChainKey.getSenderMessageKey().getIteration());
     while (senderChainKey.getIteration() < iteration) {
       senderKeyState.addSenderMessageKey(senderChainKey.getSenderMessageKey());
       senderChainKey = senderChainKey.getNext();
