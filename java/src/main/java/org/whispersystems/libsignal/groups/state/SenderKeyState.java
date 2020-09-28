@@ -144,7 +144,6 @@ public class SenderKeyState {
             }
         }
 
-//        if (isChat)
         this.senderKeyStateStructure = this.senderKeyStateStructure.toBuilder()
                 .clearSenderMessageKeys()
                 .addAllSenderMessageKeys(keys)
