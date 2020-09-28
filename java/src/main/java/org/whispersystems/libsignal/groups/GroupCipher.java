@@ -205,10 +205,11 @@ public class GroupCipher {
 
     System.out.println("MESSAGE ITERATION GREATER THAN HEAD " + senderKeyState.getStructure().getSenderMessageKeysCount());
     System.out.println("message iteration " + iteration);
+    System.out.println("senderChainKey.getIteration() " + senderChainKey.getIteration();
     while (senderChainKey.getIteration() < iteration) {
       System.out.println("NEW KEY");
 //    while (senderKeyState.getStructure().getSenderMessageKeysCount() <= iteration) {
-      senderKeyState.addSenderMessageKey(senderChainKey.getSenderMessageKey());
+//      senderKeyState.addSenderMessageKey(senderChainKey.getSenderMessageKey());
       senderChainKey = senderChainKey.getNext();
     }
 
