@@ -79,16 +79,11 @@ public class SenderKeyState {
     }
 
     public void setSenderChainKey(SenderChainKey chainKey) {
-        List<SenderKeyStateStructure.SenderMessageKey> keys = new LinkedList<>(senderKeyStateStructure.getSenderMessageKeysList());
-
         SenderKeyStateStructure.SenderChainKey senderChainKeyStructure =
                 SenderKeyStateStructure.SenderChainKey.newBuilder()
-                        .clearSenderMessageKeys()
-                        .addAllSenderMessageKeys(keys)
                         .setIteration(chainKey.getIteration())
                         .setSeed(ByteString.copyFrom(chainKey.getSeed()))
                         .build();
-
 
         this.senderKeyStateStructure = senderKeyStateStructure.toBuilder()
                 .setSenderChainKey(senderChainKeyStructure)
@@ -149,10 +144,11 @@ public class SenderKeyState {
             }
         }
 
-        this.senderKeyStateStructure = this.senderKeyStateStructure.toBuilder()
-                .clearSenderMessageKeys()
-                .addAllSenderMessageKeys(keys)
-                .build();
+        if (isChat)
+            this.senderKeyStateStructure = this.senderKeyStateStructure.toBuilder()
+                    .clearSenderMessageKeys()
+                    .addAllSenderMessageKeys(keys)
+                    .build();
 
         if (result != null) {
             return new SenderMessageKey(result.getIteration(), result.getSeed().toByteArray());
