@@ -133,6 +133,7 @@ public class GroupCipher {
                 senderKeyState.getSigningKeyPrivate());
 
 //        senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
+        senderKeyState.addSenderMessageKey(senderKeyState.getSenderChainKey().getNext().getSenderMessageKey());
 
         senderKeyStore.storeSenderKey(senderKeyId, record);
 
