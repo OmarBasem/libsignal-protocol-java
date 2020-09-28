@@ -190,6 +190,7 @@ public class GroupCipher {
 
     if (senderChainKey.getIteration() > iteration) {
       Log.d("MESSAGE ITERATION LESS THAN HEAD: ", Integer.toString(senderKeyState.getStructure().getSenderMessageKeysCount()));
+      System.out.println("MESSAGE ITERATION LESS THAN HEAD: " + senderKeyState.getStructure().getSenderMessageKeysCount());
       if (senderKeyState.hasSenderMessageKey(iteration)) {
         return senderKeyState.removeSenderMessageKey(iteration, isChat);
       } else {
@@ -203,6 +204,7 @@ public class GroupCipher {
     }
 
     Log.d("MESSAGE ITERATION GREATER THAN HEAD", "dd");
+    System.out.println("MESSAGE ITERATION GREATER THAN HEAD");
     while (senderChainKey.getIteration() < iteration) {
       senderKeyState.addSenderMessageKey(senderChainKey.getSenderMessageKey());
       senderChainKey = senderChainKey.getNext();
@@ -210,6 +212,8 @@ public class GroupCipher {
 
     senderKeyState.setSenderChainKey(senderChainKey.getNext());
     Log.d("NEW MESSAGE KEYS COUNT: ", Integer.toString(senderKeyState.getStructure().getSenderMessageKeysCount()));
+    System.out.println("NEW MESSAGE KEYS COUNT: " + senderKeyState.getStructure().getSenderMessageKeysCount());
+
     return senderChainKey.getSenderMessageKey();
   }
 }
