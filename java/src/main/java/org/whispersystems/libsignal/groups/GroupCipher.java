@@ -132,8 +132,8 @@ public class GroupCipher {
                 ciphertext,
                 senderKeyState.getSigningKeyPrivate());
 
-//        senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
-        senderKeyState.addSenderMessageKey(senderKeyState.getSenderChainKey().getNext().getSenderMessageKey());
+        senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
+//        senderKeyState.addSenderMessageKey(senderKeyState.getSenderChainKey().getNext().getSenderMessageKey());
 
         senderKeyStore.storeSenderKey(senderKeyId, record);
 
@@ -189,6 +189,7 @@ public class GroupCipher {
     SenderChainKey senderChainKey = senderKeyState.getSenderChainKey();
 
     if (senderChainKey.getIteration() > iteration) {
+      Log.d("MESSAGE ITERATION LESS THAN HEAD: ", senderKeyState.getStructure().getSenderMessageKeysCount());
       if (senderKeyState.hasSenderMessageKey(iteration)) {
         return senderKeyState.removeSenderMessageKey(iteration, isChat);
       } else {
@@ -201,12 +202,14 @@ public class GroupCipher {
       throw new InvalidMessageException("Over 2000 messages into the future!");
     }
 
+    Log.d("MESSAGE ITERATION GREATER THAN HEAD", "dd");
     while (senderChainKey.getIteration() < iteration) {
       senderKeyState.addSenderMessageKey(senderChainKey.getSenderMessageKey());
       senderChainKey = senderChainKey.getNext();
     }
 
     senderKeyState.setSenderChainKey(senderChainKey.getNext());
+    Log.d("NEW MESSAGE KEYS COUNT: ", senderKeyState.getStructure().getSenderMessageKeysCount());
     return senderChainKey.getSenderMessageKey();
   }
 }
