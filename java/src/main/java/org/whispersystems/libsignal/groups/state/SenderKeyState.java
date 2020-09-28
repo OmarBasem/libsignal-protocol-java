@@ -144,11 +144,11 @@ public class SenderKeyState {
             }
         }
 
-        if (isChat)
-            this.senderKeyStateStructure = this.senderKeyStateStructure.toBuilder()
-                    .clearSenderMessageKeys()
-                    .addAllSenderMessageKeys(keys)
-                    .build();
+//        if (isChat)
+        this.senderKeyStateStructure = this.senderKeyStateStructure.toBuilder()
+                .clearSenderMessageKeys()
+                .addAllSenderMessageKeys(keys)
+                .build();
 
         if (result != null) {
             return new SenderMessageKey(result.getIteration(), result.getSeed().toByteArray());
