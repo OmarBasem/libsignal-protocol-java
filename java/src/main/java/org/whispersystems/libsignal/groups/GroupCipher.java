@@ -203,15 +203,15 @@ public class GroupCipher {
       throw new InvalidMessageException("Over 2000 messages into the future!");
     }
 
-    Log.d("MESSAGE ITERATION GREATER THAN HEAD", "dd");
-    System.out.println("MESSAGE ITERATION GREATER THAN HEAD");
+    System.out.println("MESSAGE ITERATION GREATER THAN HEAD " + senderKeyState.getStructure().getSenderMessageKeysCount());
+    System.out.println("SENDER CHAIN KEY ITERATION COUNT " + senderChainKey.getIteration());
+    System.out.println("message iteration " + iteration);
     while (senderChainKey.getIteration() < iteration) {
       senderKeyState.addSenderMessageKey(senderChainKey.getSenderMessageKey());
       senderChainKey = senderChainKey.getNext();
     }
 
 //    senderKeyState.setSenderChainKey(senderChainKey.getNext());
-    Log.d("NEW MESSAGE KEYS COUNT: ", Integer.toString(senderKeyState.getStructure().getSenderMessageKeysCount()));
     System.out.println("NEW MESSAGE KEYS COUNT: " + senderKeyState.getStructure().getSenderMessageKeysCount());
 
     return senderChainKey.getSenderMessageKey();
