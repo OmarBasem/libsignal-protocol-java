@@ -79,11 +79,16 @@ public class SenderKeyState {
     }
 
     public void setSenderChainKey(SenderChainKey chainKey) {
+        List<SenderKeyStateStructure.SenderMessageKey> keys = new LinkedList<>(senderKeyStateStructure.getSenderMessageKeysList());
+
         SenderKeyStateStructure.SenderChainKey senderChainKeyStructure =
                 SenderKeyStateStructure.SenderChainKey.newBuilder()
+                        .clearSenderMessageKeys()
+                        .addAllSenderMessageKeys(keys)
                         .setIteration(chainKey.getIteration())
                         .setSeed(ByteString.copyFrom(chainKey.getSeed()))
                         .build();
+
 
         this.senderKeyStateStructure = senderKeyStateStructure.toBuilder()
                 .setSenderChainKey(senderChainKeyStructure)
