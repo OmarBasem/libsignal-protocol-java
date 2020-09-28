@@ -210,7 +210,7 @@ public class GroupCipher {
       senderChainKey = senderChainKey.getNext();
     }
 
-    senderKeyState.setSenderChainKey(senderChainKey.getNext());
+//    senderKeyState.setSenderChainKey(senderChainKey.getNext());
     Log.d("NEW MESSAGE KEYS COUNT: ", Integer.toString(senderKeyState.getStructure().getSenderMessageKeysCount()));
     System.out.println("NEW MESSAGE KEYS COUNT: " + senderKeyState.getStructure().getSenderMessageKeysCount());
 
