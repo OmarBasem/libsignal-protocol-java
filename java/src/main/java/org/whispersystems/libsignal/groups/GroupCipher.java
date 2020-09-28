@@ -189,7 +189,7 @@ public class GroupCipher {
     SenderChainKey senderChainKey = senderKeyState.getSenderChainKey();
 
     if (senderChainKey.getIteration() > iteration) {
-      Log.d("MESSAGE ITERATION LESS THAN HEAD: ", senderKeyState.getStructure().getSenderMessageKeysCount());
+      Log.d("MESSAGE ITERATION LESS THAN HEAD: ", Integer.toString(senderKeyState.getStructure().getSenderMessageKeysCount()));
       if (senderKeyState.hasSenderMessageKey(iteration)) {
         return senderKeyState.removeSenderMessageKey(iteration, isChat);
       } else {
@@ -209,7 +209,7 @@ public class GroupCipher {
     }
 
     senderKeyState.setSenderChainKey(senderChainKey.getNext());
-    Log.d("NEW MESSAGE KEYS COUNT: ", senderKeyState.getStructure().getSenderMessageKeysCount());
+    Log.d("NEW MESSAGE KEYS COUNT: ", Integer.toString(senderKeyState.getStructure().getSenderMessageKeysCount()));
     return senderChainKey.getSenderMessageKey();
   }
 }
