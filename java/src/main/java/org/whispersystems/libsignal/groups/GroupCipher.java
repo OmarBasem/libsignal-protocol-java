@@ -115,12 +115,18 @@ public class GroupCipher {
     }
 
     public void ratchetChain(int steps) {
-        SenderKeyRecord record = senderKeyStore.loadSenderKey(senderKeyId);
-        SenderKeyState senderKeyState = record.getSenderKeyState();
-        for (int i=0; i<steps; i++) {
-            senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
+        synchronized (LOCK) {
+            try {
+                SenderKeyRecord record = senderKeyStore.loadSenderKey(senderKeyId);
+                SenderKeyState senderKeyState = record.getSenderKeyState();
+                for (int i = 0; i < steps; i++) {
+                    senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
+                }
+                senderKeyStore.storeSenderKey(senderKeyId, record);
+            } catch (InvalidKeyIdException e) {
+                throw new NoSessionException(e);
+            }
         }
-        senderKeyStore.storeSenderKey(senderKeyId, record);
     }
 
     public byte[] encrypt(byte[] paddedPlaintext, Boolean isChat) throws NoSessionException {
