@@ -114,7 +114,7 @@ public class GroupCipher {
         }
     }
 
-    public void ratchetChain(int steps) {
+    public void ratchetChain(int steps) throws NoSessionException {
         synchronized (LOCK) {
             try {
                 SenderKeyRecord record = senderKeyStore.loadSenderKey(senderKeyId);
