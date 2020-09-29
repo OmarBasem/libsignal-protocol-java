@@ -1,10 +1,9 @@
 /**
  * Copyright (C) 2014-2016 Open Whisper Systems
- *
+ * <p>
  * Licensed according to the LICENSE file in this repository.
  */
 package org.whispersystems.libsignal.groups;
-
 
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
@@ -38,11 +37,11 @@ import org.whispersystems.libsignal.logging.Log;
 
 /**
  * The main entry point for Signal Protocol group encrypt/
-
-
-
- operations.
- *
+ * <p>
+ * <p>
+ * <p>
+ * operations.
+ * <p>
  * Once a session has been established with {@link org.whispersystems.libsignal.groups.GroupSessionBuilder}
  * and a {@link org.whispersystems.libsignal.protocol.SenderKeyDistributionMessage} has been
  * distributed to each member of the group, this class can be used for all subsequent encrypt/decrypt
@@ -52,171 +51,161 @@ import org.whispersystems.libsignal.logging.Log;
  */
 public class GroupCipher {
 
-  static final Object LOCK = new Object();
+    static final Object LOCK = new Object();
 
-  private final SenderKeyStore senderKeyStore;
-  private final SenderKeyName senderKeyId;
+    private final SenderKeyStore senderKeyStore;
+    private final SenderKeyName senderKeyId;
 
-  public GroupCipher(SenderKeyStore senderKeyStore, SenderKeyName senderKeyId) {
-    this.senderKeyStore = senderKeyStore;
-    this.senderKeyId    = senderKeyId;
-  }
-
-  /**
-   * Encrypt a message.
-   *
-   * @param paddedPlaintext The plaintext message bytes, optionally padded.
-   * @return Ciphertext.
-   * @throws NoSessionException
-   */
-
-
-  /**
-   * Decrypt a SenderKey group message.
-   *
-   * @param senderKeyMessageBytes The received ciphertext.
-   * @return Plaintext
-   * @throws LegacyMessageException
-   * @throws InvalidMessageException
-   * @throws DuplicateMessageException
-   */
-
-
-
-  private byte[] getPlainText(byte[] iv, byte[] key, byte[] ciphertext)
-          throws InvalidMessageException
-  {
-    try {
-      IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-      Cipher          cipher          = Cipher.getInstance("AES/CBC/PKCS5Padding");
-      cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), ivParameterSpec);
-      return cipher.doFinal(ciphertext);
-    } catch (NoSuchAlgorithmException | NoSuchPaddingException | java.security.InvalidKeyException |
-            InvalidAlgorithmParameterException e)
-    {
-      throw new AssertionError(e);
-    } catch (IllegalBlockSizeException | BadPaddingException e) {
-      throw new InvalidMessageException(e);
+    public GroupCipher(SenderKeyStore senderKeyStore, SenderKeyName senderKeyId) {
+        this.senderKeyStore = senderKeyStore;
+        this.senderKeyId = senderKeyId;
     }
-  }
 
-  private byte[] getCipherText(byte[] iv, byte[] key, byte[] plaintext) {
-    try {
-      IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-      Cipher          cipher          = Cipher.getInstance("AES/CBC/PKCS5Padding");
-      cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"), ivParameterSpec);
-      return cipher.doFinal(plaintext);
-    } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException |
-            IllegalBlockSizeException | BadPaddingException | java.security.InvalidKeyException e)
-    {
-      throw new AssertionError(e);
+    /**
+     * Encrypt a message.
+     *
+     * @param paddedPlaintext The plaintext message bytes, optionally padded.
+     * @return Ciphertext.
+     * @throws NoSessionException
+     */
+
+
+    /**
+     * Decrypt a SenderKey group message.
+     *
+     * @param senderKeyMessageBytes The received ciphertext.
+     * @return Plaintext
+     * @throws LegacyMessageException
+     * @throws InvalidMessageException
+     * @throws DuplicateMessageException
+     */
+
+
+    private byte[] getPlainText(byte[] iv, byte[] key, byte[] ciphertext)
+            throws InvalidMessageException {
+        try {
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), ivParameterSpec);
+            return cipher.doFinal(ciphertext);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | java.security.InvalidKeyException |
+                InvalidAlgorithmParameterException e) {
+            throw new AssertionError(e);
+        } catch (IllegalBlockSizeException | BadPaddingException e) {
+            throw new InvalidMessageException(e);
+        }
     }
-  }
 
-  private static class NullDecryptionCallback implements DecryptionCallback {
-    @Override
-    public void handlePlaintext(byte[] plaintext) {}
-  }
-
-
-  public byte[] encrypt(byte[] paddedPlaintext) throws NoSessionException {
-    synchronized (LOCK) {
-      try {
-        SenderKeyRecord  record         = senderKeyStore.loadSenderKey(senderKeyId);
-        SenderKeyState   senderKeyState = record.getSenderKeyState();
-//        SenderMessageKey senderKey      = senderKeyState.getSenderChainKey().getSenderMessageKey();
-        SenderMessageKey senderKey      = senderKeyState.getSenderChainKey().getNext().getSenderMessageKey();
-        byte[]           ciphertext     = getCipherText(senderKey.getIv(), senderKey.getCipherKey(), paddedPlaintext);
-
-        SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyState.getKeyId(),
-                senderKey.getIteration(),
-                ciphertext,
-                senderKeyState.getSigningKeyPrivate());
-
-//        senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
-//        senderKeyState.addSenderMessageKey(senderKeyState.getSenderChainKey().getNext().getSenderMessageKey());
-
-        senderKeyStore.storeSenderKey(senderKeyId, record);
-
-        return senderKeyMessage.serialize();
-      } catch (InvalidKeyIdException e) {
-        throw new NoSessionException(e);
-      }
+    private byte[] getCipherText(byte[] iv, byte[] key, byte[] plaintext) {
+        try {
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"), ivParameterSpec);
+            return cipher.doFinal(plaintext);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException |
+                IllegalBlockSizeException | BadPaddingException | java.security.InvalidKeyException e) {
+            throw new AssertionError(e);
+        }
     }
-  }
 
-  public byte[] decrypt(byte[] senderKeyMessageBytes, Boolean isChat)
-          throws LegacyMessageException, DuplicateMessageException, InvalidMessageException, NoSessionException
-  {
-    return decrypt(senderKeyMessageBytes, new NullDecryptionCallback(), isChat);
-  }
+    private static class NullDecryptionCallback implements DecryptionCallback {
+        @Override
+        public void handlePlaintext(byte[] plaintext) {
+        }
+    }
 
 
-  public byte[] decrypt(byte[] senderKeyMessageBytes, DecryptionCallback callback, Boolean isChat)
-          throws LegacyMessageException, InvalidMessageException, DuplicateMessageException,
-          NoSessionException
-  {
-    synchronized (LOCK) {
-      try {
-        SenderKeyRecord record = senderKeyStore.loadSenderKey(senderKeyId);
+    public byte[] encrypt(byte[] paddedPlaintext, Boolean isChat) throws NoSessionException {
+        synchronized (LOCK) {
+            try {
+                SenderKeyRecord record = senderKeyStore.loadSenderKey(senderKeyId);
+                SenderKeyState senderKeyState = record.getSenderKeyState();
+                SenderMessageKey senderKey;
+                if (isChat)
+                    senderKey = senderKeyState.getSenderChainKey().getSenderMessageKey();
+                else
+                    senderKey = senderKeyState.getSenderChainKey().getNext().getSenderMessageKey();
+                byte[] ciphertext = getCipherText(senderKey.getIv(), senderKey.getCipherKey(), paddedPlaintext);
 
-        if (record.isEmpty()) {
-          throw new NoSessionException("No sender key for: " + senderKeyId);
+                SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyState.getKeyId(),
+                        senderKey.getIteration(),
+                        ciphertext,
+                        senderKeyState.getSigningKeyPrivate());
+
+                if (isChat)
+                    senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
+
+                senderKeyStore.storeSenderKey(senderKeyId, record);
+
+                return senderKeyMessage.serialize();
+            } catch (InvalidKeyIdException e) {
+                throw new NoSessionException(e);
+            }
+        }
+    }
+
+    public byte[] decrypt(byte[] senderKeyMessageBytes, Boolean isChat)
+            throws LegacyMessageException, DuplicateMessageException, InvalidMessageException, NoSessionException {
+        return decrypt(senderKeyMessageBytes, new NullDecryptionCallback(), isChat);
+    }
+
+
+    public byte[] decrypt(byte[] senderKeyMessageBytes, DecryptionCallback callback, Boolean isChat)
+            throws LegacyMessageException, InvalidMessageException, DuplicateMessageException,
+            NoSessionException {
+        synchronized (LOCK) {
+            try {
+                SenderKeyRecord record = senderKeyStore.loadSenderKey(senderKeyId);
+
+                if (record.isEmpty()) {
+                    throw new NoSessionException("No sender key for: " + senderKeyId);
+                }
+
+                SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyMessageBytes);
+                SenderKeyState senderKeyState = record.getSenderKeyState(senderKeyMessage.getKeyId());
+
+                senderKeyMessage.verifySignature(senderKeyState.getSigningKeyPublic());
+
+                SenderMessageKey senderKey = getSenderKey(senderKeyState, senderKeyMessage.getIteration(), isChat);
+
+                byte[] plaintext = getPlainText(senderKey.getIv(), senderKey.getCipherKey(), senderKeyMessage.getCipherText());
+
+                callback.handlePlaintext(plaintext);
+
+                senderKeyStore.storeSenderKey(senderKeyId, record);
+
+                return plaintext;
+            } catch (org.whispersystems.libsignal.InvalidKeyException | InvalidKeyIdException e) {
+                throw new InvalidMessageException(e);
+            }
+        }
+    }
+
+    private SenderMessageKey getSenderKey(SenderKeyState senderKeyState, int iteration, Boolean isChat)
+            throws DuplicateMessageException, InvalidMessageException {
+        SenderChainKey senderChainKey = senderKeyState.getSenderChainKey();
+
+        if (senderChainKey.getIteration() > iteration) {
+            if (senderKeyState.hasSenderMessageKey(iteration)) {
+                return senderKeyState.removeSenderMessageKey(iteration, isChat);
+            } else {
+                throw new DuplicateMessageException("Received message with old counter: " +
+                        senderChainKey.getIteration() + " , " + iteration);
+            }
         }
 
-        SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyMessageBytes);
-        SenderKeyState   senderKeyState   = record.getSenderKeyState(senderKeyMessage.getKeyId());
+        if (iteration - senderChainKey.getIteration() > 2000) {
+            throw new InvalidMessageException("Over 2000 messages into the future!");
+        }
+        while (senderChainKey.getIteration() < iteration) {
+            if (isChat)
+                senderKeyState.addSenderMessageKey(senderChainKey.getSenderMessageKey());
+            senderChainKey = senderChainKey.getNext();
+        }
 
-        senderKeyMessage.verifySignature(senderKeyState.getSigningKeyPublic());
+        if (isChat)
+            senderKeyState.setSenderChainKey(senderChainKey.getNext());
 
-        SenderMessageKey senderKey = getSenderKey(senderKeyState, senderKeyMessage.getIteration(), isChat);
-
-        byte[] plaintext = getPlainText(senderKey.getIv(), senderKey.getCipherKey(), senderKeyMessage.getCipherText());
-
-        callback.handlePlaintext(plaintext);
-
-        senderKeyStore.storeSenderKey(senderKeyId, record);
-
-        return plaintext;
-      } catch (org.whispersystems.libsignal.InvalidKeyException | InvalidKeyIdException e) {
-        throw new InvalidMessageException(e);
-      }
+        return senderChainKey.getSenderMessageKey();
     }
-  }
-
-  private SenderMessageKey getSenderKey(SenderKeyState senderKeyState, int iteration, Boolean isChat)
-          throws DuplicateMessageException, InvalidMessageException
-  {
-    SenderChainKey senderChainKey = senderKeyState.getSenderChainKey();
-
-    if (senderChainKey.getIteration() > iteration) {
-      Log.d("MESSAGE ITERATION LESS THAN HEAD: ", Integer.toString(senderKeyState.getStructure().getSenderMessageKeysCount()));
-      System.out.println("MESSAGE ITERATION LESS THAN HEAD: " + senderKeyState.getStructure().getSenderMessageKeysCount());
-      if (senderKeyState.hasSenderMessageKey(iteration)) {
-        return senderKeyState.removeSenderMessageKey(iteration, isChat);
-      } else {
-        throw new DuplicateMessageException("Received message with old counter: " +
-                senderChainKey.getIteration() + " , " + iteration);
-      }
-    }
-
-    if (iteration - senderChainKey.getIteration() > 2000) {
-      throw new InvalidMessageException("Over 2000 messages into the future!");
-    }
-
-    System.out.println("MESSAGE ITERATION GREATER THAN HEAD " + senderKeyState.getStructure().getSenderMessageKeysCount());
-    System.out.println("message iteration " + iteration);
-    System.out.println("senderChainKey.getIteration() " + senderChainKey.getIteration());
-    while (senderChainKey.getIteration() < iteration) {
-      System.out.println("NEW KEY");
-//    while (senderKeyState.getStructure().getSenderMessageKeysCount() <= iteration) {
-//      senderKeyState.addSenderMessageKey(senderChainKey.getSenderMessageKey());
-      senderChainKey = senderChainKey.getNext();
-    }
-
-//    senderKeyState.setSenderChainKey(senderChainKey.getNext());
-    System.out.println("NEW MESSAGE KEYS COUNT: " + senderKeyState.getStructure().getSenderMessageKeysCount());
-
-    return senderChainKey.getSenderMessageKey();
-  }
 }
