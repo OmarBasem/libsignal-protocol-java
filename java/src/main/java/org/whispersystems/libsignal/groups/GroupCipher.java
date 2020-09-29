@@ -121,10 +121,11 @@ public class GroupCipher {
                 SenderKeyRecord record = senderKeyStore.loadSenderKey(senderKeyId);
                 SenderKeyState senderKeyState = record.getSenderKeyState();
                 SenderMessageKey senderKey;
-                if (isChat)
-                    senderKey = senderKeyState.getSenderChainKey().getSenderMessageKey();
-                else
-                    senderKey = senderKeyState.getSenderChainKey().getNext().getSenderMessageKey();
+//                if (isChat)
+                senderKey = senderKeyState.getSenderChainKey().getSenderMessageKey();
+//                else
+//                    senderKey = senderKeyState.getSenderChainKey().getNext().getSenderMessageKey();
+
                 byte[] ciphertext = getCipherText(senderKey.getIv(), senderKey.getCipherKey(), paddedPlaintext);
 
                 SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyState.getKeyId(),
@@ -132,8 +133,8 @@ public class GroupCipher {
                         ciphertext,
                         senderKeyState.getSigningKeyPrivate());
 
-                if (isChat)
-                    senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
+//                if (isChat)
+                senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
 
                 senderKeyStore.storeSenderKey(senderKeyId, record);
 
