@@ -85,13 +85,13 @@ public class SenderKeyState {
                 SenderKeyStateStructure.SenderChainKey.newBuilder()
                         .setIteration(chainKey.getIteration())
                         .setSeed(ByteString.copyFrom(chainKey.getSeed()))
-                        .clearSenderMessageKeys()
-                        .addAllSenderMessageKeys(keys)
                         .build();
 
 
         this.senderKeyStateStructure = senderKeyStateStructure.toBuilder()
                 .setSenderChainKey(senderChainKeyStructure)
+                .clearSenderMessageKeys()
+                .addAllSenderMessageKeys(keys)
                 .build();
 
     }
