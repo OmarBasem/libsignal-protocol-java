@@ -129,14 +129,14 @@ public class GroupCipher {
         }
     }
 
-    public byte[] encrypt(byte[] paddedPlaintext, Boolean isChat) throws NoSessionException {
+    public byte[] encrypt(byte[] paddedPlaintext, Boolean isChat, int steps) throws NoSessionException {
         synchronized (LOCK) {
             try {
                 SenderKeyRecord record = senderKeyStore.loadSenderKey(senderKeyId);
                 SenderKeyState senderKeyState = record.getSenderKeyState();
-                SenderMessageKey senderKey;
+//                SenderMessageKey senderKey = senderKeyState.getSenderChainKey().getSenderMessageKey();
+                SenderMessageKey senderKey = getSenderKey(senderKeyState, steps, false)
 //                if (isChat)
-                senderKey = senderKeyState.getSenderChainKey().getSenderMessageKey();
 //                else
 //                    senderKey = senderKeyState.getSenderChainKey().getNext().getSenderMessageKey();
 
@@ -148,9 +148,9 @@ public class GroupCipher {
                         senderKeyState.getSigningKeyPrivate());
 
 //                if (isChat)
-                senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
+//                senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
 
-                senderKeyStore.storeSenderKey(senderKeyId, record);
+//                senderKeyStore.storeSenderKey(senderKeyId, record);
 
                 return senderKeyMessage.serialize();
             } catch (InvalidKeyIdException e) {
