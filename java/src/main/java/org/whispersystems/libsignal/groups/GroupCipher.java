@@ -137,11 +137,14 @@ public class GroupCipher {
 
                 SenderChainKey firstSenderChainKey = senderKeyState.getSenderChainKey();
                 SenderChainKey senderChainKey = senderKeyState.getSenderChainKey();
+                System.out.println("ITERATIONSSS " + senderChainKey.getIteration());
                 while (senderChainKey.getIteration() < steps) {
+                    System.out.println("NEW KEY");
                     senderChainKey = senderChainKey.getNext();
                 }
                 senderKeyState.setSenderChainKey(senderChainKey);
-//                SenderMessageKey senderKey = senderKeyState.getSenderChainKey().getSenderMessageKey();
+//                senderKeyStore.storeSenderKey(senderKeyId, record);
+                SenderMessageKey senderKey = senderKeyState.getSenderChainKey().getSenderMessageKey();
 //                SenderMessageKey senderKey = getSenderKey(senderKeyState, steps, false);
 //                senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
 
@@ -151,6 +154,7 @@ public class GroupCipher {
 
                 byte[] ciphertext = getCipherText(senderKey.getIv(), senderKey.getCipherKey(), paddedPlaintext);
 
+                System.out.println("WHATITERATION? " + senderKey.getIteration());
                 SenderKeyMessage senderKeyMessage = new SenderKeyMessage(senderKeyState.getKeyId(),
                         senderKey.getIteration(),
                         ciphertext,
