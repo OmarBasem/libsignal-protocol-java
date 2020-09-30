@@ -141,8 +141,10 @@ public class GroupCipher {
                 while (senderChainKey.getIteration() < steps) {
                     System.out.println("NEW KEY");
                     senderChainKey = senderChainKey.getNext();
+                    senderKeyState.addSenderMessageKey(senderChainKey.getSenderMessageKey());
                 }
                 senderKeyState.setSenderChainKey(senderChainKey);
+
 //                senderKeyStore.storeSenderKey(senderKeyId, record);
                 SenderMessageKey senderKey = senderKeyState.getSenderChainKey().getSenderMessageKey();
 //                SenderMessageKey senderKey = getSenderKey(senderKeyState, steps, false);
@@ -162,10 +164,11 @@ public class GroupCipher {
 
                 senderKeyState.setSenderChainKey(firstSenderChainKey);
 
+
 //                if (isChat)
 //                senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
 
-//                senderKeyStore.storeSenderKey(senderKeyId, record);
+                senderKeyStore.storeSenderKey(senderKeyId, record);
 
                 return senderKeyMessage.serialize();
             } catch (InvalidKeyIdException e) {
