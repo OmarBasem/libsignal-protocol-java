@@ -134,8 +134,17 @@ public class GroupCipher {
             try {
                 SenderKeyRecord record = senderKeyStore.loadSenderKey(senderKeyId);
                 SenderKeyState senderKeyState = record.getSenderKeyState();
+
+                SenderChainKey firstSenderChainKey = senderKeyState.getSenderChainKey();
+                SenderChainKey senderChainKey = senderKeyState.getSenderChainKey();
+                while (senderChainKey.getIteration() < steps) {
+                    senderChainKey = senderChainKey.getNext();
+                }
+                senderKeyState.setSenderChainKey(senderChainKey);
 //                SenderMessageKey senderKey = senderKeyState.getSenderChainKey().getSenderMessageKey();
-                SenderMessageKey senderKey = getSenderKey(senderKeyState, steps, false);
+//                SenderMessageKey senderKey = getSenderKey(senderKeyState, steps, false);
+//                senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
+
 //                if (isChat)
 //                else
 //                    senderKey = senderKeyState.getSenderChainKey().getNext().getSenderMessageKey();
@@ -146,6 +155,8 @@ public class GroupCipher {
                         senderKey.getIteration(),
                         ciphertext,
                         senderKeyState.getSigningKeyPrivate());
+
+                senderKeyState.setSenderChainKey(firstSenderChainKey);
 
 //                if (isChat)
 //                senderKeyState.setSenderChainKey(senderKeyState.getSenderChainKey().getNext());
@@ -199,6 +210,7 @@ public class GroupCipher {
     private SenderMessageKey getSenderKey(SenderKeyState senderKeyState, int iteration, Boolean isChat)
             throws DuplicateMessageException, InvalidMessageException {
         SenderChainKey senderChainKey = senderKeyState.getSenderChainKey();
+
 
         if (senderChainKey.getIteration() > iteration) {
             if (senderKeyState.hasSenderMessageKey(iteration)) {
