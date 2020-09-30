@@ -1,7 +1,7 @@
 subprojects {
  
     ext.curve25519_version = "0.5.0"
-    ext.version_number     = "3.2.8"
+    ext.version_number     = "3.2.9"
 
     ext.group_info         = "org.whispersystems"
 

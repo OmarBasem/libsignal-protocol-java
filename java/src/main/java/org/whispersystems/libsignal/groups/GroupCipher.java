@@ -135,7 +135,7 @@ public class GroupCipher {
                 SenderKeyRecord record = senderKeyStore.loadSenderKey(senderKeyId);
                 SenderKeyState senderKeyState = record.getSenderKeyState();
 //                SenderMessageKey senderKey = senderKeyState.getSenderChainKey().getSenderMessageKey();
-                SenderMessageKey senderKey = getSenderKey(senderKeyState, steps, false)
+                SenderMessageKey senderKey = getSenderKey(senderKeyState, steps, false);
 //                if (isChat)
 //                else
 //                    senderKey = senderKeyState.getSenderChainKey().getNext().getSenderMessageKey();
