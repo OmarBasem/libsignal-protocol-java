@@ -79,23 +79,21 @@ public class SenderKeyState {
     }
 
     public void setSenderChainKey(SenderChainKey chainKey) {
+        List<SenderKeyStateStructure.SenderMessageKey> keys = new LinkedList<>(senderKeyStateStructure.getSenderMessageKeysList());
+
         SenderKeyStateStructure.SenderChainKey senderChainKeyStructure =
                 SenderKeyStateStructure.SenderChainKey.newBuilder()
                         .setIteration(chainKey.getIteration())
                         .setSeed(ByteString.copyFrom(chainKey.getSeed()))
+                        .clearSenderMessageKeys()
+                        .addAllSenderMessageKeys(keys)
                         .build();
-
-        List<SenderKeyStateStructure.SenderMessageKey> keys = new LinkedList<>(senderKeyStateStructure.getSenderMessageKeysList());
 
 
         this.senderKeyStateStructure = senderKeyStateStructure.toBuilder()
                 .setSenderChainKey(senderChainKeyStructure)
                 .build();
 
-        this.senderKeyStateStructure = this.senderKeyStateStructure.toBuilder()
-                .clearSenderMessageKeys()
-                .addAllSenderMessageKeys(keys)
-                .build();
     }
 
     public ECPublicKey getSigningKeyPublic() throws InvalidKeyException {
