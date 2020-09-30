@@ -129,7 +129,7 @@ public class GroupCipher {
         }
     }
 
-    public byte[] encrypt(byte[] paddedPlaintext, Boolean isChat, int steps) throws NoSessionException {
+    public byte[] encrypt(byte[] paddedPlaintext, Boolean isChat, int steps) throws NoSessionException, DuplicateMessageException, InvalidMessageException {
         synchronized (LOCK) {
             try {
                 SenderKeyRecord record = senderKeyStore.loadSenderKey(senderKeyId);
